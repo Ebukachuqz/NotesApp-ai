@@ -103,3 +103,23 @@ export const useNoteQueries = () => {
     isDeletingNote: deleteNoteMutation.isPending,
   };
 };
+
+export const useNoteQuery = (noteId: string) => {
+  const { getToken } = useAuth();
+
+  const getNoteById = async () => {
+    const token = await getToken();
+    return fetcher<Note>(
+      `/api/notes/${noteId}`,
+      "GET",
+      undefined,
+      token || undefined
+    );
+  };
+
+  return useQuery({
+    queryKey: ["note", noteId],
+    queryFn: getNoteById,
+    enabled: !!noteId,
+  });
+};

@@ -1,26 +1,31 @@
-// components/MainContentLayout.tsx
+"use client";
 import { ReactNode } from "react";
 import { FileTextIcon, BellIcon, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface MainContentLayoutProps {
   children: ReactNode;
   title?: string;
+  type?: "editor" | "list";
 }
 
 export default function NotesDashboardContentLayout({
   children,
   title = "Notes",
+  type = "list",
 }: MainContentLayoutProps) {
+  const router = useRouter();
   return (
     <div className="flex-1 flex flex-col ml-[50px]">
       {/* Header */}
       <header className="w-full justify-between px-3 py-[11px] h-13 sticky top-0 z-10 bg-white border-b border-[#e8e8e8] flex items-center">
         <div className="inline-flex items-center gap-2 relative flex-[0_0_auto]">
-          {title.toLowerCase() === "Notes".toLowerCase() ? (
+          {type === "list" ? (
             <FileTextIcon className="w-6 h-6" />
           ) : (
             <Button
+              onClick={() => router.back()}
               variant="outline"
               size="icon"
               className="w-7 h-7 p-1.5 bg-[#fcfcfd] font-bold cursor-pointer rounded-md border border-solid border-[#dddde3]"

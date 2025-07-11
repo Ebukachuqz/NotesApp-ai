@@ -1,5 +1,5 @@
 "use client";
-import { defaultEditorContent } from "@/lib/content";
+
 import {
   EditorCommand,
   EditorCommandEmpty,
@@ -28,73 +28,93 @@ import { uploadFn } from "./image-upload";
 import { TextButtons } from "./selectors/text-buttons";
 import { slashCommand, suggestionItems } from "./slash-command";
 
-import hljs from "highlight.js";
+// --- 1. Import hooks and types ---
+import { useNoteQueries } from "@/hooks/useNoteQueries";
+import { Note } from "@/types";
+import { Loader2, Check, AlertCircle } from "lucide-react";
 
 const extensions = [...defaultExtensions, slashCommand];
 
-const TailwindAdvancedEditor = () => {
+// --- 2. Add a 'note' prop to the component ---
+interface EditorProps {
+  note: Note;
+}
+
+const TailwindAdvancedEditor = ({ note }: EditorProps) => {
+  // --- 3. Get the updateNote mutation and its status ---
+  const { updateNote, isUpdatingNote } = useNoteQueries();
+
   const [initialContent, setInitialContent] = useState<null | JSONContent>(
     null
   );
-  const [saveStatus, setSaveStatus] = useState("Saved");
-  const [charsCount, setCharsCount] = useState();
+
+  // The save status will now be more detailed
+  const [saveStatus, setSaveStatus] = useState<
+    "Saved" | "Saving..." | "Unsaved" | "Error"
+  >("Saved");
 
   const [openNode, setOpenNode] = useState(false);
   const [openColor, setOpenColor] = useState(false);
   const [openLink, setOpenLink] = useState(false);
   const [openAI, setOpenAI] = useState(false);
 
-  //Apply Codeblock Highlighting on the HTML from editor.getHTML()
-  const highlightCodeblocks = (content: string) => {
-    const doc = new DOMParser().parseFromString(content, "text/html");
-    doc.querySelectorAll("pre code").forEach((el) => {
-      // @ts-ignore
-      // https://highlightjs.readthedocs.io/en/latest/api.html?highlight=highlightElement#highlightelement
-      hljs.highlightElement(el);
-    });
-    return new XMLSerializer().serializeToString(doc);
-  };
-
+  // --- 4. Rewrite the debounced function to save to the API ---
   const debouncedUpdates = useDebouncedCallback(
     async (editor: EditorInstance) => {
       const json = editor.getJSON();
-      setCharsCount(editor.storage.characterCount.words());
-      window.localStorage.setItem(
-        "html-content",
-        highlightCodeblocks(editor.getHTML())
+
+      // Set status to "Saving..." before the API call
+      setSaveStatus("Saving...");
+
+      updateNote(
+        {
+          noteId: note.$id,
+          data: { content: JSON.stringify(json) },
+        },
+        {
+          onSuccess: () => {
+            // Set status to "Saved" on success
+            setSaveStatus("Saved");
+          },
+          onError: () => {
+            // Set status to "Error" on failure
+            setSaveStatus("Error");
+          },
+        }
       );
-      window.localStorage.setItem("novel-content", JSON.stringify(json));
-      window.localStorage.setItem(
-        "markdown",
-        editor.storage.markdown.getMarkdown()
-      );
-      setSaveStatus("Saved");
     },
-    500
+    1000 // Debounce for 1 second
   );
 
+  // --- 5. Load initial content from the note prop, not localStorage ---
   useEffect(() => {
-    const content = window.localStorage.getItem("novel-content");
-    if (content) setInitialContent(JSON.parse(content));
-    else setInitialContent(defaultEditorContent);
-  }, []);
+    if (note?.content) {
+      try {
+        setInitialContent(JSON.parse(note.content));
+      } catch (e) {
+        // If content is not valid JSON, use a default
+        setInitialContent({ type: "doc", content: [] });
+      }
+    }
+  }, [note]);
 
-  if (!initialContent) return null;
+  if (!initialContent) return null; // Or a loading skeleton
 
   return (
     <div className="relative w-full max-w-screen-lg">
-      <div className="flex absolute right-5 top-5 z-10 mb-5 gap-2">
-        <div className="rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
+      <div className="flex absolute right-5 top-5 z-10 mb-5 gap-2 items-center">
+        {/* --- 6. Update the save status indicator --- */}
+        <div className="flex items-center gap-2 rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground">
+          {saveStatus === "Saving..." && (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          )}
+          {saveStatus === "Saved" && (
+            <Check className="h-4 w-4 text-green-500" />
+          )}
+          {saveStatus === "Error" && (
+            <AlertCircle className="h-4 w-4 text-red-500" />
+          )}
           {saveStatus}
-        </div>
-        <div
-          className={
-            charsCount
-              ? "rounded-lg bg-accent px-2 py-1 text-sm text-muted-foreground"
-              : "hidden"
-          }
-        >
-          {charsCount} Words
         </div>
       </div>
       <EditorRoot>
@@ -116,8 +136,8 @@ const TailwindAdvancedEditor = () => {
             },
           }}
           onUpdate={({ editor }) => {
-            debouncedUpdates(editor);
             setSaveStatus("Unsaved");
+            debouncedUpdates(editor);
           }}
           slotAfter={<ImageResizer />}
         >
