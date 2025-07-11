@@ -3,6 +3,7 @@ import { ReactNode } from "react";
 import { FileTextIcon, BellIcon, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 interface MainContentLayoutProps {
   children: ReactNode;
@@ -40,7 +41,12 @@ export default function NotesDashboardContentLayout({
           </div>
         </div>
 
-        <div className="inline-flex items-center justify-end gap-2">
+        <div className="flex items-center justify-center gap-2">
+          <div className="">
+            <SignedIn>
+              <UserButton showName />
+            </SignedIn>
+          </div>
           <Button
             variant="outline"
             size="icon"
