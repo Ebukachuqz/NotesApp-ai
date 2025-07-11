@@ -55,10 +55,10 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
 
   return (
     <Card
-      className="flex flex-col gap-0 py-[12px] bg-white border border-[#DDDDE3] rounded-[6px] shadow-2xs hover:shadow transition-shadow cursor-pointer"
+      className="flex flex-col gap-0 py-[12px] h-[196px] bg-white border border-[#DDDDE3] rounded-[6px] shadow-2xs hover:shadow transition-shadow cursor-pointer"
       onClick={onClick}
     >
-      <CardHeader className="flex flex-row items-center justify-between px-[12px] pb-[4px]">
+      <CardHeader className="flex flex-row items-center justify-between px-[12px] pt-0 pb-[4px]">
         <div className="flex items-center gap-2">
           <Avatar className="w-5 h-5">
             <AvatarImage src={note.company.avatar} alt={note.company.name} />

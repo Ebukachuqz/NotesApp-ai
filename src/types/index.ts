@@ -2,15 +2,15 @@
 
 // Represents a Note as it is stored in the Appwrite database and returned by our API.
 export interface Note {
-  $id: string; // Appwrite's unique document ID
-  $createdAt: string; // Appwrite's document creation timestamp
-  $updatedAt: string; // Appwrite's document update timestamp
+  $id: string;
+  $createdAt: string;
+  $updatedAt: string;
   title: string;
-  content: string; // This will be a JSON string from the Novel editor
-  description?: string; // Optional description
+  content: string;
+  description?: string;
   userId: string;
-  createdAt: string; // Our custom creation timestamp
-  updatedAt: string; // Our custom update timestamp
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Represents the data needed to create a new note.
