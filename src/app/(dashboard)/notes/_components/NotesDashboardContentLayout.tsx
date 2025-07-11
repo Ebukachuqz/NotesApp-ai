@@ -1,6 +1,6 @@
 // components/MainContentLayout.tsx
 import { ReactNode } from "react";
-import { FileTextIcon, BellIcon } from "lucide-react";
+import { FileTextIcon, BellIcon, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface MainContentLayoutProps {
@@ -17,7 +17,17 @@ export default function NotesDashboardContentLayout({
       {/* Header */}
       <header className="w-full justify-between px-3 py-[11px] h-13 sticky top-0 z-10 bg-white border-b border-[#e8e8e8] flex items-center">
         <div className="inline-flex items-center gap-2 relative flex-[0_0_auto]">
-          <FileTextIcon className="w-6 h-6" />
+          {title.toLowerCase() === "Notes".toLowerCase() ? (
+            <FileTextIcon className="w-6 h-6" />
+          ) : (
+            <Button
+              variant="outline"
+              size="icon"
+              className="w-7 h-7 p-1.5 bg-[#fcfcfd] font-bold cursor-pointer rounded-md border border-solid border-[#dddde3]"
+            >
+              <ChevronLeft className="w-3.5 h-3.5 " />
+            </Button>
+          )}
           <div className="flex flex-col">
             <div className="text-[#1c2024] text-base font-medium tracking-tight leading-[1.5] whitespace-nowrap">
               {title}
@@ -29,7 +39,7 @@ export default function NotesDashboardContentLayout({
           <Button
             variant="outline"
             size="icon"
-            className="w-7 h-7 p-1.5 bg-[#fcfcfd] rounded-md border border-solid border-[#dddde3]"
+            className="w-7 h-7 p-1.5 bg-[#fcfcfd] cursor-pointer rounded-md border border-solid border-[#dddde3]"
           >
             <BellIcon className="w-3.5 h-3.5" />
           </Button>
