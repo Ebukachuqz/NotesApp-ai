@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@radix-ui/react-label";
+// import { Input } from "@/components/ui/input";
+// import { Label } from "@radix-ui/react-label";
 import React from "react";
 
-export const AuthLayout = () => {
+export const AuthLayout = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
   const footerLinks = [
     { text: "Privacy & Terms", href: "#" },
     { text: "Contact us", href: "#" },
@@ -14,7 +18,7 @@ export const AuthLayout = () => {
     <div className="flex h-screen w-full">
       <div className="bg-[#f9f9fb] overflow-hidden flex flow-row w-full h-lvh relative">
         {/* Right side - Login form */}
-        <div className="absolute w-1/2 h-[900px] top-0 left-1/2 bg-white">
+        <div className="absolute w-1/2 h-[900px] top-0 left-1/2 bg-white -mt-20">
           <div className="flex flex-col w-[380px] items-center gap-[26px] p-6 absolute top-[258px] left-[169px]">
             <div className="inline-flex flex-col items-center gap-1.5 relative flex-[0_0_auto]">
               <div className="relative w-fit mt-[-1.00px] bg-[linear-gradient(90deg,rgba(91,91,214,1)_0%,rgba(170,153,236,1)_100%)] [-webkit-background-clip:text] bg-clip-text [-webkit-text-fill-color:transparent] [text-fill-color:transparent] font-typography-6-bold font-[number:var(--typography-6-bold-font-weight)] text-transparent text-[length:var(--typography-6-bold-font-size)] tracking-[var(--typography-6-bold-letter-spacing)] leading-[var(--typography-6-bold-line-height)] whitespace-nowrap [font-style:var(--typography-6-bold-font-style)]">
@@ -27,7 +31,7 @@ export const AuthLayout = () => {
               </div>
             </div>
 
-            <div className="flex flex-col items-center gap-7 relative self-stretch w-full flex-[0_0_auto]">
+            {/* <div className="flex flex-col items-center gap-7 relative self-stretch w-full flex-[0_0_auto]">
               <div className="flex flex-col items-start gap-4 relative self-stretch w-full flex-[0_0_auto]">
                 <div className="flex flex-col items-start gap-1 relative self-stretch w-full flex-[0_0_auto]">
                   <Label className="text-[#646464] text-xs tracking-[0.04px] leading-4">
@@ -59,7 +63,8 @@ export const AuthLayout = () => {
                   </Button>
                 </div>
               </div>
-            </div>
+            </div> */}
+            {children}
           </div>
 
           <div className="inline-flex items-start gap-6 absolute top-[846px] left-[237px]">

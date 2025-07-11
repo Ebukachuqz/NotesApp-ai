@@ -1,13 +1,19 @@
 "use client";
 
 import React from "react";
-import { useParams } from "next/navigation";
+import { redirect, useParams } from "next/navigation";
 import { useNoteQuery } from "@/hooks/useNoteQueries";
 import NotesDashboardContentLayout from "../_components/NotesDashboardContentLayout";
 import TailwindAdvancedEditor from "@/components/advanced-editor";
 import { Loader2 } from "lucide-react";
+import { useAuth } from "@clerk/nextjs";
 
 const NoteEditorPage = () => {
+  const { isSignedIn } = useAuth();
+
+  if (!isSignedIn) {
+    redirect("/sign-in");
+  }
   const params = useParams<{ id: string }>();
   const noteId = params.id;
 
