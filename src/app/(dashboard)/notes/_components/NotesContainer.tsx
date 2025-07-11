@@ -1,28 +1,58 @@
+"use client";
+
 import React from "react";
 import NotesList from "./NotesList";
+import { useNoteQueries } from "@/hooks/useNoteQueries";
+import { useUser } from "@clerk/nextjs";
+import { Note } from "@/types";
+import { FileText, Loader2 } from "lucide-react";
 
 export const NotesContainerSection = () => {
-  // Create a data structure for the notes to avoid repetition
-  const notes = Array(10).fill({
-    company: {
-      name: "Edify INC",
-      avatar:
-        "https://c.animaapp.com/mcx5vg07CJFNc5/img/avatar-w--photo-18.png",
-    },
-    title: "Investment Note",
-    description:
-      "Figma ipsum component variant main layer. Union mask shadow ipsum pencil mask align pen layout create.",
-    author: {
-      name: "Thomas brown",
-      avatar: "https://c.animaapp.com/mcx5vg07CJFNc5/img/frame-14619.png",
-    },
-    date: "Jan 5, 2020",
-  });
+  const { notes, isLoadingNotes, isErrorNotes } = useNoteQueries();
+  const { user } = useUser();
 
-  return (
-    <section className="flex flex-col items-start gap-6 w-full">
-      <NotesList notes={notes} />
-    </section>
-  );
+  if (isLoadingNotes) {
+    return (
+      <div className="flex justify-center items-center h-64 w-full">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      </div>
+    );
+  }
+
+  if (isErrorNotes) {
+    return (
+      <div className="p-4 bg-red-100 text-red-700 rounded-lg text-center w-full">
+        <p>Could not load your notes. Please try again later.</p>
+      </div>
+    );
+  }
+
+  if (!notes || notes.length === 0) {
+    return (
+      <div className="flex flex-col justify-center items-center h-64 w-full text-center text-gray-500 border-2 border-dashed rounded-lg">
+        <FileText className="h-12 w-12 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-700">
+          You have no notes yet
+        </h3>
+        <p className="mt-2">
+          Click the &quot;Create Note&quot; button to get started.
+        </p>
+      </div>
+    );
+  }
+
+  const formattedNotes = notes?.map((note: Note) => ({
+    id: note.$id,
+    title: note.title,
+    description: note.description || "No description provided.",
+    date: new Date(note.createdAt).toDateString(),
+    company: { name: "NoteApp", avatar: "/logo.svg" },
+    author: {
+      name: user?.fullName || "Anonymous User",
+      avatar: user?.imageUrl || "/placeholder.svg",
+    },
+  }));
+
+  return <NotesList notes={formattedNotes || []} />;
 };
 export default NotesContainerSection;

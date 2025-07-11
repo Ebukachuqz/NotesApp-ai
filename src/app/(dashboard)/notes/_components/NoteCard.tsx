@@ -16,20 +16,23 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-interface NoteCardProps {
-  note: {
-    title: string;
-    description?: string;
-    date: string;
-    company: {
-      name: string;
-      avatar: string;
-    };
-    author: {
-      name: string;
-      avatar: string;
-    };
+export interface FormattedNote {
+  id: string;
+  title: string;
+  description?: string;
+  date: string;
+  company: {
+    name: string;
+    avatar: string;
   };
+  author: {
+    name: string;
+    avatar: string;
+  };
+}
+
+interface NoteCardProps {
+  note: FormattedNote;
   onClick?: () => void;
 }
 
@@ -46,7 +49,6 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -59,16 +61,13 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
       <CardHeader className="flex flex-row items-center justify-between px-[12px] pb-[4px]">
         <div className="flex items-center gap-2">
           <Avatar className="w-5 h-5">
-            <AvatarImage
-              src={note.company.avatar || "/placeholder.svg"}
-              alt={note.company.name}
-            />
+            <AvatarImage src={note.company.avatar} alt={note.company.name} />
             <AvatarFallback className="text-xs bg-green-500 text-white">
               {note.company.name.charAt(0)}
             </AvatarFallback>
           </Avatar>
           <span className="text-sm text-[#60646C] font-[400] text-[14px]">
-            Edify INC
+            {note.company.name}
           </span>
         </div>
         <div className="relative" ref={dropdownRef}>
@@ -81,39 +80,17 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
           >
             <MoreHorizontalIcon className="w-4 h-4 text-[#9ca3af]" />
           </button>
-
           {showDropdown && (
             <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 min-w-[140px]">
-              <button
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowDropdown(false);
-                  // Add edit functionality here
-                }}
-              >
+              <button className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
                 <Edit className="w-4 h-4" />
                 Edit note
               </button>
-              <button
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowDropdown(false);
-                  // Add share functionality here
-                }}
-              >
+              <button className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
                 <Share className="w-4 h-4" />
                 Share note
               </button>
-              <button
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowDropdown(false);
-                  // Add delete functionality here
-                }}
-              >
+              <button className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
                 <Trash2 className="w-4 h-4" />
                 Delete note
               </button>
@@ -121,7 +98,6 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
           )}
         </div>
       </CardHeader>
-
       <CardContent className="flex flex-col flex-1 px-[12px] pb-[24px]">
         <h3 className="text-[16px] text-[#111827] leading-tight gap-[8px]">
           {note.title}
@@ -132,14 +108,10 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
             : note.description}
         </p>
       </CardContent>
-
       <CardFooter className="flex items-center justify-between pb-[4px] px-[12px] font-[400] text-[12px]">
         <div className="flex items-center gap-2">
           <Avatar className="w-5 h-5">
-            <AvatarImage
-              src={note.author.avatar || "/placeholder.svg"}
-              alt={note.author.name}
-            />
+            <AvatarImage src={note.author.avatar} alt={note.author.name} />
             <AvatarFallback className="text-xs bg-gray-400 text-white">
               {note.author.name.charAt(0)}
             </AvatarFallback>
