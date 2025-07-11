@@ -46,7 +46,7 @@ export const NotesContainerSection = () => {
     title: note.title,
     description: note.description || "No description provided.",
     date: new Date(note.createdAt).toDateString(),
-    company: { name: "NoteApp", avatar: "/logo.svg" },
+    company: { name: "Edify INC", avatar: "/logo.svg" },
     author: {
       name: user?.fullName || "Anonymous User",
       avatar: user?.imageUrl || "/placeholder.svg",
