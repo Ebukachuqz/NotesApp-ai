@@ -17,6 +17,10 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 
+import { useNoteQueries } from "@/hooks/useNoteQueries"; // or wherever it's located
+import { Button } from "@/components/ui/button"; // assuming you're using Shadcn
+import { Loader2 } from "lucide-react";
+
 export interface FormattedNote {
   id: string;
   title: string;
@@ -41,6 +45,22 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const { deleteNote, isDeletingNote } = useNoteQueries(); // use your mutation hook
+
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowConfirmDelete(true);
+  };
+
+  const confirmDelete = () => {
+    deleteNote(note.id, {
+      onSuccess: () => {
+        setShowConfirmDelete(false);
+      },
+    });
+  };
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the card's onClick from firing
@@ -100,7 +120,10 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
                 <Share className="w-4 h-4" />
                 Share note
               </button>
-              <button className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50">
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+              >
                 <Trash2 className="w-4 h-4" />
                 Delete note
               </button>
@@ -133,6 +156,36 @@ export default function NoteCard({ note, onClick }: NoteCardProps) {
           <span className="text-xs text-[#6b7280]">{note.date}</span>
         </div>
       </CardFooter>
+      {showConfirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg text-gray-900 mb-4">
+              Are you sure you want to delete{" "}
+              <strong>&quot;{note.title}&quot;</strong>?
+            </h2>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                variant="ghost"
+                className="text-gray-700"
+                onClick={() => setShowConfirmDelete(false)}
+                disabled={isDeletingNote}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={isDeletingNote}
+              >
+                {isDeletingNote && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }
